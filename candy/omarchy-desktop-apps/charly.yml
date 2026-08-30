@@ -1,0 +1,83 @@
+omarchy-desktop-apps:
+    candy:
+        version: 2026.242.0000
+        description: |
+            The desktop applications Omarchy ships — file manager, document and image viewers, productivity apps and input methods.
+            omarchy-desktop-apps installs the graphical applications the distribution's
+            application menu and its default MIME associations point at. Without them the
+            desktop starts but every file-open action resolves to nothing. The set is the
+            one Omarchy's own base package list names, not a curated subset. Verifiable on
+            the built image: the file manager and viewers are on PATH, the input-method
+            bridges are installed, and the application menu carries their desktop entries.
+        require:
+            - '@github.com/opencharly/layer-omarchy-base/candy/omarchy-base:v2026.242.0437'
+        distro:
+            arch:
+                package:
+                    # File manager and the gvfs backends its network/removable browsing
+                    # needs, plus the disk utility its context menu opens.
+                    - nautilus
+                    - nautilus-python
+                    - sushi
+                    - gnome-disk-utility
+                    - gvfs-mtp
+                    - gvfs-nfs
+                    - gvfs-smb
+                    - exfatprogs
+                    - dosfstools
+                    - udiskie
+                    # Documents, images and productivity. omawrite and omacalc are
+                    # Omarchy-published and resolve from [omarchy].
+                    - libreoffice-fresh
+                    - obsidian
+                    - evince
+                    - imv
+                    - xournalpp
+                    - omawrite
+                    - omacalc
+                    - localsend
+                    # Input methods. fcitx5 is what Omarchy's environment.d drop-in
+                    # configures GTK and Qt to use; without the gtk/qt bridges the
+                    # daemon runs but no application can compose through it.
+                    - fcitx5
+                    - fcitx5-gtk
+                    - fcitx5-qt
+        plan:
+            - check: the file manager the desktop's bindings open is installed
+              id: omarchy-apps-files
+              context:
+                - build
+              file:
+                file: /usr/bin/nautilus
+                exists: true
+
+            - check: the document and image viewers the default MIME associations point at are installed
+              id: omarchy-apps-viewers
+              context:
+                - build
+              exit_status: 0
+              command: |
+                  set -eu
+                    command -v evince >/dev/null || { echo "missing: evince" >&2; exit 1; }
+                    command -v imv >/dev/null || { echo "missing: imv" >&2; exit 1; }
+
+            - check: the input-method bridges the environment.d drop-in configures are installed
+              id: omarchy-apps-fcitx
+              context:
+                - build
+              package:
+                package: fcitx5-gtk
+
+            - check: the application menu carries the entries these applications register
+              id: omarchy-apps-desktop-entries
+              context:
+                - build
+              # The binary being on PATH is not what makes an app reachable from the
+              # launcher — the .desktop entry is. They come from the same packages, but a
+              # NoExtract rule or a stripped image can drop the entries while leaving the
+              # binaries, and the desktop then looks empty for no visible reason.
+              exit_status: 0
+              command: |
+                  set -eu
+                  n=$(ls /usr/share/applications/ | grep -icE 'nautilus|evince|imv|obsidian|libreoffice')
+                  [ "$n" -ge 5 ] || { echo "only $n expected desktop entries found" >&2; exit 1; }
