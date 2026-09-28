@@ -1,6 +1,5 @@
 omarchy-desktop-apps:
     candy:
-        version: 2026.242.0000
         description: |
             The desktop applications Omarchy ships — file manager, document and image viewers, productivity apps and input methods.
             omarchy-desktop-apps installs the graphical applications the distribution's
