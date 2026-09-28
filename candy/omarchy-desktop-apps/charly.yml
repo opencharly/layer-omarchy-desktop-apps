@@ -1,6 +1,5 @@
 omarchy-desktop-apps:
     candy:
-        version: 2026.242.0000
         description: |
             The desktop applications Omarchy ships — file manager, document and image viewers, productivity apps and input methods.
             omarchy-desktop-apps installs the graphical applications the distribution's
@@ -10,7 +9,7 @@ omarchy-desktop-apps:
             the built image: the file manager and viewers are on PATH, the input-method
             bridges are installed, and the application menu carries their desktop entries.
         require:
-            - '@github.com/opencharly/layer-omarchy-base/candy/omarchy-base:v2026.242.0437'
+            - '@github.com/opencharly/layer-omarchy-base/candy/omarchy-base:v2026.242.0701'
         distro:
             arch:
                 package:
@@ -50,24 +49,21 @@ omarchy-desktop-apps:
               file:
                 file: /usr/bin/nautilus
                 exists: true
-
             - check: the document and image viewers the default MIME associations point at are installed
               id: omarchy-apps-viewers
               context:
                 - build
               exit_status: 0
               command: |
-                  set -eu
-                    command -v evince >/dev/null || { echo "missing: evince" >&2; exit 1; }
-                    command -v imv >/dev/null || { echo "missing: imv" >&2; exit 1; }
-
+                set -eu
+                  command -v evince >/dev/null || { echo "missing: evince" >&2; exit 1; }
+                  command -v imv >/dev/null || { echo "missing: imv" >&2; exit 1; }
             - check: the input-method bridges the environment.d drop-in configures are installed
               id: omarchy-apps-fcitx
               context:
                 - build
               package:
                 package: fcitx5-gtk
-
             - check: the application menu carries the entries these applications register
               id: omarchy-apps-desktop-entries
               context:
@@ -78,6 +74,6 @@ omarchy-desktop-apps:
               # binaries, and the desktop then looks empty for no visible reason.
               exit_status: 0
               command: |
-                  set -eu
-                  n=$(ls /usr/share/applications/ | grep -icE 'nautilus|evince|imv|obsidian|libreoffice')
-                  [ "$n" -ge 5 ] || { echo "only $n expected desktop entries found" >&2; exit 1; }
+                set -eu
+                n=$(ls /usr/share/applications/ | grep -icE 'nautilus|evince|imv|obsidian|libreoffice')
+                [ "$n" -ge 5 ] || { echo "only $n expected desktop entries found" >&2; exit 1; }
