@@ -9,7 +9,7 @@ omarchy-desktop-apps:
             the built image: the file manager and viewers are on PATH, the input-method
             bridges are installed, and the application menu carries their desktop entries.
         require:
-            - '@github.com/opencharly/layer-omarchy-base/candy/omarchy-base:v2026.242.0437'
+            - '@github.com/opencharly/layer-omarchy-base/candy/omarchy-base:v2026.272.0437'
         distro:
             arch:
                 package:
